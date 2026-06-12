@@ -14,12 +14,12 @@ Grafana dashboard.
 
 ```mermaid
 flowchart TD
-    A[Python Sensor Simulator] -->|Message Queuing Telemetry Transport MQTT | B[Azure IoT Hub]
+    A[Python Sensor Simulator] --> |Message Queuing Telemetry Transport MQTT | B[Azure IoT Hub]
     B --> C[Azure Stream Analytics]
-    C -->|All readings| D[Azure SQL Database]
-    C -->|Anomaly: temp > 100| E[Service Bus Queue]
+    C --> |All readings| D[Azure SQL Database]
+    C --> |Anomaly: temp greater than 100|E[Service Bus Queue]
     E --> F[Logic App]
-    F -->|SendGrid| G[Email Alert]
+    F --> G[Email Alert via SendGrid]
     D --> H[Grafana Dashboard]
 ```
 
