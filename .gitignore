@@ -3,3 +3,5 @@ venv/
 __pycache__/
 *.pyc
 aws/certs/
+.DS_Store
+**/.DS_Store
