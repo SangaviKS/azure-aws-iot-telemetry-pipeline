@@ -59,7 +59,8 @@ iot-telemetry-project/
 │   └── sensor.py        # Cloud-agnostic sensor simulation logic
 ├── azure/
 │   └── simulator.py     # Azure IoT Hub integration
-├── aws/                 # AWS integration │   ├── lambda_function.py
+├── aws/                 # AWS integration 
+│   ├── lambda_function.py
 │   └── simulator.py
 ├── screenshots/
 │   ├── Dual-cloud-simulators.png
