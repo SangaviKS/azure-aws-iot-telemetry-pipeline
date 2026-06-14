@@ -10,8 +10,9 @@ Grafana dashboard.
 
 ![Alert Email sent via SendGrid](screenshots/SendGrid-alert-email.png)
 
-# Architecture
+## Architecture
 
+### Azure Pipeline
 ```mermaid
 flowchart TD
     A[Python Sensor Simulator] --> |Message Queuing Telemetry Transport MQTT | B[Azure IoT Hub]
@@ -22,6 +23,18 @@ flowchart TD
     F --> G[Email Alert via SendGrid]
     D --> H[Grafana Dashboard]
 ```
+### AWS Pipeline
+```mermaid
+flowchart TD
+    A[Python Sensor Simulator] --> |Message Queuing Telemetry Transport MQTT | B[AWS IoT Core]
+    B --> C[IoT Rule]
+    C --> D[Lambda Function]
+    D --> E[DynamoDB Table]
+    E --> F[Grafana Dashboard]
+    C --> |Anomaly: temp greater than 100|G[SNS Topic]
+    G --> H[Email Alert]
+```
+
 
 ## Features
 - Cloud-agnostic Python sensor simulator (`core/` module)
@@ -46,8 +59,10 @@ iot-telemetry-project/
 │   └── sensor.py        # Cloud-agnostic sensor simulation logic
 ├── azure/
 │   └── simulator.py     # Azure IoT Hub integration
-├── aws/                 # AWS integration (in progress)
+├── aws/                 # AWS integration │   ├── lambda_function.py
+│   └── simulator.py
 ├── screenshots/
+│   ├── Dual-cloud-simulators.png
 │   ├── Grafana-Dashboard.png
 │   ├── Outlook-alert-email.png
 │   └── SendGrid-alert-email.png
@@ -77,19 +92,32 @@ AZURE_IOTHUB_CONNECTION_STRING=your-connection-string
 - Python 3.14 on macOS requires SSL certificates to be explicitly set. 
   The venv `activate` file sets `SSL_CERT_FILE` and `REQUESTS_CA_BUNDLE` 
   automatically using the certifi bundle.
-- Initially used the Outlook connector for email alerts but hit persistent 
-  regional throttling (429 errors) on the shared Logic Apps connector 
+- Initially used the Outlook connector for email alerts for Azure but hit persistent regional throttling (429 errors) on the shared Logic Apps connector 
   infrastructure. Diagnosed via run history and response headers, then 
   migrated to SendGrid for reliable transactional email — a more 
   production-appropriate choice for alerting anyway.
 
 ## Cost
-This project runs at effectively $0/month using:
-- Azure IoT Hub F1 free tier
-- Azure SQL free offer (32 GB)
-- Service Bus Basic tier (fractions of a cent)
-- SendGrid free tier (100 emails/day)
-- Grafana (open source, self-hosted)
+This project runs at effectively $0/month
+### Azure
+| Service | Cost |
+|---|---|
+| Azure IoT Hub F1 free tier | $0 |
+| Azure SQL free offer 32GB | $0 |
+| Service Bus Basic tier | ~$0.01/month |
+| SendGrid free tier 100 emails/day | $0 |
+| Grafana open source self-hosted | $0 |
+| **Total** | **~$0/month** |
+
+### AWS
+| Service | Cost |
+|---|---|
+| AWS IoT Core 500,000 messages/month | $0 |
+| Lambda 1 million invocations/month | $0 |
+| DynamoDB 25GB free forever | $0 |
+| SNS 1 million notifications/month | $0 |
+| Grafana open source self-hosted | $0 |
+| **Total** | **$0/month** |
 
 ## What I Learned
 - Real-time stream processing and anomaly detection with Azure Stream Analytics
